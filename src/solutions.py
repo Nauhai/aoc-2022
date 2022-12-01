@@ -3,6 +3,7 @@ import time
 import os
 from collections import defaultdict
 import traceback
+import math
 
 
 SOLUTIONS = defaultdict(lambda: {1: None, 2: None})
@@ -61,13 +62,21 @@ def compute(funcs, input):
 
         print(f"----- Day {func.day:02} - Part {func.part} -----")
 
-        start = time.perf_counter()
         try:
+            start = time.perf_counter()
             result = func(input)
             counter = time.perf_counter() - start
             print(f"Returned result: {result}")
-            print(f"In {counter}s")
+            print(f"In {prettify_counter(counter)}")
         except Exception as e:
             print(f"Raised an error: {traceback.format_exc()}")
 
         print("---------------------------\n")
+
+
+def prettify_counter(elapsed_time):
+    suffixes = ["ns", "ms", "s"]
+    ns = elapsed_time * 10**6
+    exp = int(math.log(ns, 1000))
+    exp = min(exp, len(suffixes)-1)
+    return str(round(ns / 1000**exp, 3)) + suffixes[exp]
