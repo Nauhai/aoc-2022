@@ -1,6 +1,10 @@
 import sys
 import requests
 import os
+import dotenv
+
+
+dotenv.load_dotenv()
 
 
 def fetch_input(day, session_cookie):
