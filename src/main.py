@@ -4,6 +4,7 @@ import solutions
 import day01
 import day02
 import day03
+import day04
 
 
 if __name__ == "__main__":
