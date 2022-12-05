@@ -5,6 +5,7 @@ import day01
 import day02
 import day03
 import day04
+import day05
 
 
 if __name__ == "__main__":
