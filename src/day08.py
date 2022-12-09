@@ -8,102 +8,83 @@ def parse_grid(input_text):
     return grid
 
 
+def find_visible_horizontal(grid, range_l, range_c):
+    visible = set()
+    for l in range_l:
+        max_h = -1
+        for c in range_c:
+            h = grid[l][c]
+            if h > max_h:
+                max_h = h
+                if not (l, c) in visible:
+                    visible.add((l, c))
+    return visible
+
+def find_visible_vertical(grid, range_c, range_l):
+    visible = set()
+    for c in range_c:
+        max_h = -1
+        for l in range_l:
+            h = grid[l][c]
+            if h > max_h:
+                max_h = h
+                if not (l, c) in visible:
+                    visible.add((l, c))
+    return visible
+
+
+def print_grid(grid, visible):
+    for l in range(len(grid)):
+        for c in range(len(grid[0])):
+            if (l, c) in visible:
+                print("#", end="")
+            else:
+                print(grid[l][c], end="")
+        print()
+
+
 @solutions.solution(day=8, part=1)
 def part_one(input_text):
     grid = parse_grid(input_text)
     nb_l, nb_c = len(grid), len(grid[0])
 
-    viewed = [None] * nb_l
-    for l in range(nb_l):
-        viewed[l] = [False] * nb_c
+    visible_left = find_visible_horizontal(grid, range(nb_l), range(nb_c))
+    visible_right = find_visible_horizontal(grid, range(nb_l), range(nb_c)[::-1])
+    visible_top = find_visible_vertical(grid, range(nb_c), range(nb_l))
+    visible_bottom = find_visible_vertical(grid, range(nb_c), range(nb_l)[::-1])
 
-    visible = 0
+    return len(visible_left.union(visible_right, visible_top, visible_bottom))
 
-    # Left to right
-    for l in range(nb_l):
-        max_h = -1
-        for c in range(nb_c):
-            h = grid[l][c]
-            if h > max_h:
-                max_h = h
-                if not viewed[l][c]:
-                    visible += 1
-                    viewed[l][c] = True
-    
-    # Right to left
-    for l in range(len(grid)):
-        max_h = -1
-        for c in range(nb_l)[::-1]:
-            h = grid[l][c]
-            if h > max_h:
-                max_h = h
-                if not viewed[l][c]:
-                    visible += 1
-                    viewed[l][c] = True
 
-    # Top to bottom
-    for c in range(nb_c):
-        max_h = -1
-        for l in range(nb_l):
-            h = grid[l][c]
-            if h > max_h:
-                max_h = h
-                if not viewed[l][c]:
-                    visible += 1
-                    viewed[l][c] = True
-    # bottom to top
-    for c in range(nb_c):
-        max_h = -1
-        for l in range(nb_l)[::-1]:
-            h = grid[l][c]
-            if h > max_h:
-                max_h = h
-                if not viewed[l][c]:
-                    visible += 1
-                    viewed[l][c] = True
+def get_viewing_distance_horizontal(grid, l, c, range_c):
+    height = grid[l][c]
+    distance = 0
+    for i in range_c:
+        distance += 1
+        if grid[l][i] >= height:
+            break
+    return distance
 
-    return visible
+
+def get_viewing_distance_vertical(grid, l, c, range_l):
+    height = grid[l][c]
+    distance = 0
+    for i in range_l:
+        distance += 1
+        if grid[i][c] >= height:
+            break
+    return distance 
 
 
 def get_scenic_score(grid, l, c):
     nb_l, nb_c = len(grid), len(grid[0])
 
-    h = grid[l][c]
-    total_view = 1
+    view_right = get_viewing_distance_horizontal(grid, l, c, range(c+1, nb_c))
+    view_left = get_viewing_distance_horizontal(grid, l, c, range(0, c)[::-1])
+    view_top = get_viewing_distance_vertical(grid, l, c, range(0, l)[::-1])
+    view_bottom = get_viewing_distance_vertical(grid, l, c, range(l+1, nb_l))
 
-    # Right
-    curr_view1 = 0
-    for i in range(c+1, nb_c):
-        curr_view1 += 1
-        if grid[l][i] >= h:
-            break
-    total_view *= curr_view1
-
-    # Left
-    curr_view2 = 0
-    for i in range(0, c)[::-1]:
-        curr_view2 += 1
-        if grid[l][i] >= h:
-            break
-    total_view *= curr_view2
-
-    # Bottom
-    curr_view3 = 0
-    for j in range(l+1, nb_l):
-        curr_view3 += 1
-        if grid[j][c] >= h:
-            break
-    total_view *= curr_view3
-    
-    # Top
-    curr_view4 = 0
-    for j in range(0, l)[::-1]:
-        curr_view4 += 1
-        if grid[j][c] >= h:
-            break
-    total_view *= curr_view4
-
-    return total_view
+    return view_left * view_right * view_top * view_bottom
 
 
 @solutions.solution(day=8, part=2)
