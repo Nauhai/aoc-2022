@@ -11,6 +11,7 @@ import day07
 import day08
 import day09
 import day10
+import day11
 
 
 if __name__ == "__main__":
